@@ -1,29 +1,50 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { getImgUrl } from "../utils/cine-utillity";
 import Rating from "./Rating";
 import MovieDetailsModal from "./MovieDetailsModal";
+import { MovieContext } from "../context";
 
 export default function MovieCart({ movie }) {
+  // State Hook
   const [showModal, setShowModal] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
+  // Context Hook
+  const { cartData, setCartData } = useContext(MovieContext);
 
-  function handleModalClose(){
+  // Click Handler
+  function handleModalClose() {
     setSelectedMovie(null);
-    setShowModal(false)
+    setShowModal(false);
   }
 
-  function handleMovieSelection(movie){ 
-    setSelectedMovie(movie)
-    setShowModal(true)
+  function handleMovieSelection(movie) {
+    setSelectedMovie(movie);
+    setShowModal(true);
+  }
+
+  function handleAddToCart(event, movie) {
+    event.stopPropagation();
+
+    const found = cartData.find((item) => {
+      return item.id === movie.id;
+    });
+
+    if (!found) {
+      setCartData([...cartData, movie]);
+    } else {
+      console.error(`The Movie ${movie.title} Has Been Already Added to cart`);
+    }
   }
 
   return (
     <>
-    {showModal && <MovieDetailsModal movie={selectedMovie} onClose={handleModalClose} />}
-      
+      {showModal && (
+        <MovieDetailsModal movie={selectedMovie} onClose={handleModalClose} onCartAdd={handleAddToCart} />
+      )}
+
       <figure className="p-4 border border-black/10 shadow-sm dark:border-white/10 rounded-xl">
-      <a onClick={()=> handleMovieSelection(movie)} href="#">
+        <a onClick={() => handleMovieSelection(movie)} href="#">
           <img
             className="w-full object-cover"
             src={getImgUrl(movie.cover)}
@@ -41,12 +62,12 @@ export default function MovieCart({ movie }) {
             <a
               className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
               href="#"
+              onClick={(e) => handleAddToCart(e, movie)}
             >
               <img src="./assets/tag.svg" alt="" />
               <span>${movie.price} | Add to Cart</span>
             </a>
           </figcaption>
-
         </a>
       </figure>
     </>
