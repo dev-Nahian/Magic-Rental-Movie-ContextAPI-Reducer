@@ -14,8 +14,16 @@ export default function Header() {
   const [showCart, setShowCart] = useState(false)
 
   // Context Hook
-  const {cartData} = useContext(MovieContext);
+  // const {cartData} = useContext(MovieContext);
   const {darkMode, setDarkMode} = useContext(ThemeContext)
+
+
+  // UseReducer
+  const {state} = useContext(MovieContext)
+
+
+  console.log(state.cartData);
+  
 
  
   // Click Handler
@@ -70,9 +78,14 @@ export default function Header() {
                 alt="shoppingCart"
               />
               {
-                cartData.length > 0 && (
+                // cartData.length > 0 && (
+                //   <span className="rounded-full absolute top-[-12px] left-[28px] bg-[#12CF6F] text-white text-center p-[2px] w-[30px] h-[30px]">
+                //     {cartData.length}
+                //   </span>
+                // )
+                state.cartData.length > 0 && (
                   <span className="rounded-full absolute top-[-12px] left-[28px] bg-[#12CF6F] text-white text-center p-[2px] w-[30px] h-[30px]">
-                    {cartData.length}
+                    {state.cartData.length}
                   </span>
                 )
               }

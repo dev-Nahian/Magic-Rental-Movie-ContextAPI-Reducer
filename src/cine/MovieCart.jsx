@@ -3,6 +3,7 @@ import { getImgUrl } from "../utils/cine-utillity";
 import Rating from "./Rating";
 import MovieDetailsModal from "./MovieDetailsModal";
 import { MovieContext } from "../context";
+import { toast } from "react-toastify";
 
 export default function MovieCart({ movie }) {
   // State Hook
@@ -10,7 +11,10 @@ export default function MovieCart({ movie }) {
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   // Context Hook
-  const { cartData, setCartData } = useContext(MovieContext);
+  /*const { cartData, setCartData } = useContext(MovieContext);*/
+
+  // UseReducer
+  const { state, dispatch } = useContext(MovieContext);
 
   // Click Handler
   function handleModalClose() {
@@ -23,24 +27,50 @@ export default function MovieCart({ movie }) {
     setShowModal(true);
   }
 
+  // Add To Cart Function
   function handleAddToCart(event, movie) {
     event.stopPropagation();
 
-    const found = cartData.find((item) => {
+    // const found = cartData.find((item) => {
+    //   return item.id === movie.id;
+    // });
+
+    // if (!found) {
+    //   setCartData([...cartData, movie]);
+    // } else {
+    //   console.error(`The Movie ${movie.title} Has Been Already Added to cart`);
+    // }
+
+    const found = state.cartData.find((item) => {
       return item.id === movie.id;
     });
 
     if (!found) {
-      setCartData([...cartData, movie]);
+      dispatch({
+        type: "ADD_TO_CART",
+        payload: {
+          ...movie,
+        },
+      });
+
+      toast.success(`Movie ${movie.title} added successfully`, {
+        position: "bottom-right",
+      });
     } else {
-      console.error(`The Movie ${movie.title} Has Been Already Added to cart`);
+      toast.error(` ${movie.title} Has Been Already Added to cart`, {
+        position: "bottom-right",
+      });
     }
   }
 
   return (
     <>
       {showModal && (
-        <MovieDetailsModal movie={selectedMovie} onClose={handleModalClose} onCartAdd={handleAddToCart} />
+        <MovieDetailsModal
+          movie={selectedMovie}
+          onClose={handleModalClose}
+          onCartAdd={handleAddToCart}
+        />
       )}
 
       <figure className="p-4 border border-black/10 shadow-sm dark:border-white/10 rounded-xl">
@@ -59,17 +89,17 @@ export default function MovieCart({ movie }) {
               <Rating value={movie.rating} />
             </div>
 
-            <a
+            <button
               className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
               href="#"
               onClick={(e) => handleAddToCart(e, movie)}
             >
               <img src="./assets/tag.svg" alt="" />
               <span>${movie.price} | Add to Cart</span>
-            </a>
+            </button>
           </figcaption>
         </a>
-      </figure>
+      </figure>     
     </>
   );
 }
